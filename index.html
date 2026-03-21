@@ -3,60 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portal Ciência & Tecnologia</title>
 
-<style>
-:root {
-  --bg: #0f172a;
-  --card: #1e293b;
-  --text: white;
-}
-body.light {
-  --bg: #f1f5f9;
-  --card: #ffffff;
-  --text: #0f172a;
-}
-body {
-  margin: 0;
-  font-family: Arial;
-  background: var(--bg);
-  color: var(--text);
-}
-header {
-  padding: 20px;
-  text-align: center;
-  background: #020617;
-}
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
-  gap: 20px;
-}
-.card {
-  background: var(--card);
-  padding: 15px;
-  border-radius: 10px;
-}
-button {
-  padding: 10px;
-  margin: 5px;
-  cursor: pointer;
-}
-img {
-  width: 100%;
-  border-radius: 10px;
-}
-#searchGlobal {
-  padding: 10px;
-  width: 60%;
-  margin: 10px;
-}
-</style>
+<!-- SEO -->
+<title>Portal Ciência & Tecnologia | Notícias de IA, Quantum, Medicina, Espaço</title>
+<meta name="description" content="Notícias diárias de tecnologia, inteligência artificial, computação quântica, medicina, espaço, energia e ciência.">
+<meta name="keywords" content="tecnologia, inteligência artificial, computação quântica, medicina, espaço, ciência, energia, robótica">
+<meta name="author" content="Portal Ciência & Tecnologia">
+
+<link rel="stylesheet" href="style.css">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXXXXX');
+</script>
+
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXX"
+crossorigin="anonymous"></script>
+
 </head>
 
 <body>
@@ -64,179 +32,96 @@ img {
 <header>
 <h1>🌐 Portal Ciência & Tecnologia</h1>
 <p id="updateDate"></p>
+<p>👥 Visitantes: <span id="visitorCount">0</span></p>
 
-<input type="text" id="searchGlobal" placeholder="Pesquisar todas as notícias...">
-<button onclick="searchNews()">🔎 Pesquisar</button>
+<nav>
+<a id="nav-home" href="index.html">Início</a>
+<a id="nav-technology" href="technology.html">Tecnologia</a>
+<a id="nav-ai" href="ai.html">IA</a>
+<a id="nav-quantum" href="quantum.html">Quantum</a>
+<a id="nav-medicine" href="medicine.html">Medicina</a>
+<a id="nav-science" href="science.html">Ciência</a>
+<a id="nav-space" href="space.html">Espaço</a>
+<a id="nav-robotics" href="robotics.html">Robótica</a>
+<a id="nav-energy" href="energy.html">Energia</a>
+<a id="nav-biotech" href="biotech.html">Biotecnologia</a>
+<a id="nav-physics" href="physics.html">Física</a>
+<a id="nav-future" href="future.html">Futuro</a>
+<a id="nav-articles" href="artigos.html">Artigos</a>
+<a id="nav-premium" href="premium.html">Premium</a>
+</nav>
 
-<br>
-
-<button onclick="loadCategory('technology')">💻 Tecnologia</button>
-<button onclick="loadCategory('ai')">🤖 IA</button>
-<button onclick="loadCategory('quantum')">⚛️ Quantum</button>
-<button onclick="loadCategory('medicine')">🧬 Medicina</button>
-<button onclick="loadCategory('science')">🔬 Ciência</button>
-<button onclick="loadCategory('space')">🚀 Espaço</button>
-<button onclick="loadCategory('robotics')">🤖 Robótica</button>
-<button onclick="loadCategory('energy')">🔋 Energia</button>
-<button onclick="loadCategory('biotech')">🧪 Biotecnologia</button>
-<button onclick="loadCategory('physics')">🔬 Física</button>
-<button onclick="loadCategory('future')">🌍 Futuro</button>
-
-<br>
+<button onclick="toggleLanguage()">🌍 PT / EN</button>
 <button onclick="toggleTheme()">🌙 Tema</button>
-<button onclick="showFavorites()">⭐ Favoritos</button>
+
 </header>
 
 <div class="container">
+
+<h2>🔥 Notícias Populares</h2>
 <div class="grid" id="news"></div>
 
-<h2>⭐ Notícias Guardadas</h2>
-<div class="grid" id="favNews"></div>
+<!-- Anúncio -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-XXXXXXXX"
+     data-ad-slot="123456789"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<h3>📘 Produtos Recomendados</h3>
+<a href="https://www.amazon.es/?tag=teuid-21" target="_blank">Livro Inteligência Artificial</a><br>
+<a href="https://www.amazon.es/?tag=teuid-21" target="_blank">Computadores Portáteis</a><br>
+<a href="https://www.amazon.es/?tag=teuid-21" target="_blank">Livros Ciência</a>
+
+<h3>💖 Apoiar o Website</h3>
+<form action="https://www.paypal.com/donate" method="post" target="_top">
+<input type="hidden" name="business" value="O_TEU_EMAIL_PAYPAL">
+<input type="hidden" name="currency_code" value="EUR">
+<input type="submit" value="Doar com PayPal">
+</form>
+
 </div>
 
+<script src="script.js"></script>
+<script src="translate.js"></script>
+
 <script>
-let articles = [];
+let currentCategory = "technology";
+loadNews("technology");
 
-// CARREGAR CATEGORIAS
-async function loadCategory(category) {
-
-  let url = "https://api.spaceflightnewsapi.net/v4/articles/";
-
-  if(category === "quantum") url += "?search=quantum";
-  if(category === "medicine") url += "?search=medicine";
-  if(category === "science") url += "?search=science";
-  if(category === "ai") url += "?search=artificial intelligence";
-  if(category === "space") url += "?search=space";
-  if(category === "robotics") url += "?search=robot";
-  if(category === "energy") url += "?search=energy";
-  if(category === "biotech") url += "?search=biotech";
-  if(category === "physics") url += "?search=physics";
-  if(category === "future") url += "?search=technology";
-  if(category === "technology") url += "?search=technology";
-
-  const res = await fetch(url);
-  const data = await res.json();
-
-  articles = data.results.map(a => ({
-    title: a.title,
-    description: a.summary,
-    url: a.url,
-    image: a.image_url,
-    date: a.published_at
-  }));
-
-  renderNews(articles);
-  updateDate();
-}
-
-// PESQUISA GLOBAL
-async function searchNews() {
-  const term = document.getElementById("searchGlobal").value;
-  if (!term) return;
-
-  const res = await fetch("https://api.spaceflightnewsapi.net/v4/articles/?search=" + term);
-  const data = await res.json();
-
-  articles = data.results.map(a => ({
-    title: a.title,
-    description: a.summary,
-    url: a.url,
-    image: a.image_url,
-    date: a.published_at
-  }));
-
-  renderNews(articles);
-  document.getElementById("updateDate").innerText = "Resultados para: " + term;
-}
-
-// MOSTRAR NOTÍCIAS
-function renderNews(list) {
-  list.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-  const container = document.getElementById("news");
-  container.innerHTML = "";
-
-  list.forEach(a => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <img src="${a.image}">
-      <h3>${a.title}</h3>
-      <p>${a.description}</p>
-      <button onclick="speak('${a.title}')">🔊 Ouvir</button>
-      <button onclick="saveFavorite('${a.title}','${a.description}','${a.url}','${a.image}')">⭐ Guardar</button>
-      <br><br>
-      <a href="${a.url}" target="_blank">Ler mais</a>
-    `;
-
-    container.appendChild(card);
-  });
-}
-
-// DATA
-function updateDate() {
-  const today = new Date().toLocaleDateString();
-  document.getElementById("updateDate").innerText =
-    "Última atualização: " + today;
-}
-
-// PESQUISA ENTER
-document.getElementById("searchGlobal").addEventListener("keypress", function(e) {
-  if (e.key === "Enter") {
-    searchNews();
-  }
-});
-
-// VOZ
-function speak(text) {
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "pt-PT";
-  speechSynthesis.speak(speech);
-}
-
-// FAVORITOS
-function saveFavorite(title, desc, url, image) {
-  const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-  favs.push({title, desc, url, image});
-  localStorage.setItem("favorites", JSON.stringify(favs));
-  alert("Guardado nos favoritos");
-}
-
-function showFavorites() {
-  const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-  const container = document.getElementById("favNews");
-  container.innerHTML = "";
-
-  favs.forEach(a => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <img src="${a.image}">
-      <h3>${a.title}</h3>
-      <p>${a.desc}</p>
-      <a href="${a.url}" target="_blank">Abrir</a>
-    `;
-
-    container.appendChild(card);
-  });
-}
-
-// TEMA
 function toggleTheme() {
   document.body.classList.toggle("light");
 }
 
-// ATUALIZA TODOS OS DIAS
-setInterval(() => loadCategory('technology'), 86400000);
-
-// CARREGAR AO INICIAR
-loadCategory('technology');
+// Contador visitantes
+async function updateVisitorCount() {
+  const res = await fetch("https://api.countapi.xyz/hit/portal-ciencia-tecnologia/visitas");
+  const data = await res.json();
+  document.getElementById("visitorCount").innerText = data.value;
+}
+updateVisitorCount();
 </script>
 
 </body>
 </html>
+
+
+
+
+
+
+  
+
+
+
+
+   
+
+
 
 
 
