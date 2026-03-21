@@ -3,66 +3,271 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tech News</title>
+<title>Tech News Pro AI</title>
 
 <style>
-body {
-  font-family: Arial;
-  margin: 0;
-  background: #0f172a;
-  color: white;
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: white;
 }
+
+body.light {
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --text: #0f172a;
+}
+
+body {
+  margin: 0;
+  font-family: Arial;
+  background: var(--bg);
+  color: var(--text);
+}
+
 header {
-  background: #020617;
   padding: 20px;
   text-align: center;
+  background: #020617;
 }
+
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: auto;
   padding: 20px;
 }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+  gap: 20px;
+}
+
 .card {
-  background: #1e293b;
+  background: var(--card);
   padding: 15px;
-  margin: 10px 0;
   border-radius: 10px;
 }
-a { color: #38bdf8; }
+
+input, select {
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+img {
+  width: 100%;
+  border-radius: 10px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>🌐 Tech News</h1>
-<button onclick="loadNews()">Atualizar</button>
+<h1 id="title">🌐 Tech News</h1>
+
+<select onchange="changeLanguage(this.value)">
+  <option value="pt">Português</option>
+  <option value="en">English</option>
+</select>
+
+<button onclick="toggleTheme()" id="themeBtn">Tema</button>
+<button onclick="topNews()" id="topBtn">Top Notícias</button>
+<button onclick="showFavorites()" id="favBtn">Favoritos</button>
 </header>
 
-<div class="container" id="news"></div>
+<div class="container">
+
+<input type="text" id="search" placeholder="Pesquisar notícias..." onkeyup="filterNews()">
+
+<h2 id="trendTitle">Tendências</h2>
+<div id="trends"></div>
+
+<div class="grid" id="news"></div>
+
+<h2 id="savedTitle">Notícias Guardadas</h2>
+<div class="grid" id="favNews"></div>
+
+</div>
 
 <script>
+let articles = [];
+let currentLang = "pt";
+
+// TRADUÇÕES
+const translations = {
+  pt: {
+    title: "🌐 Tech News",
+    theme: "Tema",
+    top: "Top Notícias",
+    fav: "Favoritos",
+    trends: "Tendências",
+    saved: "Notícias Guardadas",
+    search: "Pesquisar notícias...",
+    read: "Ler mais",
+    save: "Guardar",
+    listen: "Ouvir",
+    summary: "Resumo IA"
+  },
+  en: {
+    title: "🌐 Tech News",
+    theme: "Theme",
+    top: "Top News",
+    fav: "Favorites",
+    trends: "Trends",
+    saved: "Saved News",
+    search: "Search news...",
+    read: "Read more",
+    save: "Save",
+    listen: "Listen",
+    summary: "AI Summary"
+  }
+};
+
+function changeLanguage(lang) {
+  currentLang = lang;
+  document.getElementById("title").innerText = translations[lang].title;
+  document.getElementById("themeBtn").innerText = translations[lang].theme;
+  document.getElementById("topBtn").innerText = translations[lang].top;
+  document.getElementById("favBtn").innerText = translations[lang].fav;
+  document.getElementById("trendTitle").innerText = translations[lang].trends;
+  document.getElementById("savedTitle").innerText = translations[lang].saved;
+  document.getElementById("search").placeholder = translations[lang].search;
+  renderNews(articles);
+}
+
+// CARREGAR NOTÍCIAS
 async function loadNews() {
   const res = await fetch("https://api.spaceflightnewsapi.net/v4/articles/");
   const data = await res.json();
 
-  const news = data.results;
+  articles = data.results.map(a => ({
+    title: a.title,
+    description: a.summary,
+    url: a.url,
+    image: a.image_url
+  }));
+
+  renderNews(articles);
+  showTrends();
+}
+
+// MOSTRAR NOTÍCIAS
+function renderNews(list) {
+  const t = translations[currentLang];
   const container = document.getElementById("news");
   container.innerHTML = "";
 
-  news.forEach(n => {
-    container.innerHTML += `
-      <div class="card">
-        <h3>${n.title}</h3>
-        <p>${n.summary}</p>
-        <a href="${n.url}" target="_blank">Ler mais</a>
-      </div>
+  list.forEach(a => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <img src="${a.image}">
+      <h3>${a.title}</h3>
+      <p>${a.description}</p>
+      <button onclick="speak('${a.title}')">🔊 ${t.listen}</button>
+      <button onclick="saveFavorite('${a.title}','${a.description}','${a.url}','${a.image}')">⭐ ${t.save}</button>
+      <button onclick="summarize('${a.description}')">🤖 ${t.summary}</button>
+      <br><br>
+      <a href="${a.url}" target="_blank">${t.read}</a>
     `;
+
+    container.appendChild(card);
   });
 }
+
+// PESQUISA
+function filterNews() {
+  const term = document.getElementById("search").value.toLowerCase();
+  const filtered = articles.filter(a => a.title.toLowerCase().includes(term));
+  renderNews(filtered);
+}
+
+// TEMA
+function toggleTheme() {
+  document.body.classList.toggle("light");
+}
+
+// VOZ
+function speak(text) {
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = currentLang === "pt" ? "pt-PT" : "en-US";
+  speechSynthesis.speak(speech);
+}
+
+// FAVORITOS
+function saveFavorite(title, desc, url, image) {
+  const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+  favs.push({title, desc, url, image});
+  localStorage.setItem("favorites", JSON.stringify(favs));
+  alert("Saved!");
+}
+
+function showFavorites() {
+  const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+  const container = document.getElementById("favNews");
+  container.innerHTML = "";
+
+  favs.forEach(a => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <img src="${a.image}">
+      <h3>${a.title}</h3>
+      <p>${a.desc}</p>
+      <a href="${a.url}" target="_blank">Open</a>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+// TENDÊNCIAS
+function showTrends() {
+  const trends = {};
+  articles.forEach(a => {
+    const words = a.title.split(" ");
+    words.forEach(w => {
+      if(w.length > 4) trends[w] = (trends[w] || 0) + 1;
+    });
+  });
+
+  let html = "";
+  Object.keys(trends).slice(0,5).forEach(t => {
+    html += `<p>${t}</p>`;
+  });
+
+  document.getElementById("trends").innerHTML = html;
+}
+
+// TOP
+function topNews() {
+  const sorted = [...articles].sort(() => Math.random() - 0.5);
+  renderNews(sorted.slice(0,5));
+}
+
+// RESUMO
+function summarize(text) {
+  alert(text.substring(0,120) + "...");
+}
+
+// AUTO UPDATE
+setInterval(loadNews, 300000);
 
 loadNews();
 </script>
 
 </body>
 </html>
+
+
+    
