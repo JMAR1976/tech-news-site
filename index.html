@@ -1,4 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notícias Mais Pesquisadas</title>
 
+<style>
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: white;
+}
+body.light {
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --text: #0f172a;
+}
+body {
+  margin: 0;
+  font-family: Arial;
+  background: var(--bg);
+  color: var(--text);
+}
+header {
+  padding: 20px;
+  text-align: center;
+  background: #020617;
+}
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+  gap: 20px;
+}
+.card {
+  background: var(--card);
+  padding: 15px;
+  border-radius: 10px;
+}
+img {
+  width: 100%;
+  border-radius: 10px;
+}
+button {
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+}
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #020617;
+  margin-top: 40px;
+}
+a { color: #38bdf8; }
+h2 { margin-top: 40px; }
+</style>
+</head>
+
+<body>
+
+<header>
+<h1 id="title">🌐 Notícias Mais Pesquisadas no Mundo</h1>
+<p id="updateDate"></p>
+<p><span id="visitorText">Visitantes:</span> <span id="visitorCount">0</span></p>
+
+<button onclick="toggleLanguage()">🌍 PT / EN</button>
+<button onclick="toggleTheme()">🌙 Tema</button>
+</header>
+
+<div class="container" id="newsContainer"></div>
+
+<footer>
+<p>Este website funciona como agregador de notícias, mostrando apenas títulos, resumos e links para as fontes oficiais.</p>
+<p><a href="legal.html">Aviso Legal</a></p>
+</footer>
+
+<script>
+// TEMAS MAIS PESQUISADOS
+const topics = [
+  {pt: "Inteligência Artificial", en: "Artificial Intelligence", search: "artificial intelligence"},
+  {pt: "Tecnologia", en: "Technology", search: "technology"},
+  {pt: "Medicina", en: "Medicine", search: "medicine"},
+  {pt: "Ciência", en: "Science", search: "science"},
+  {pt: "Espaço", en: "Space", search: "space"},
+  {pt: "Energia", en: "Energy", search: "energy"},
+  {pt: "Robótica", en: "Robotics", search: "robotics"},
+  {pt: "Computação Quântica", en: "Quantum Computing", search: "quantum"},
+  {pt: "Alterações Climáticas", en: "Climate Change", search: "climate"},
+  {pt: "Smartphones", en: "Smartphones", search: "smartphone"},
+  {pt: "Internet", en: "Internet", search: "internet"},
+  {pt: "Cibersegurança", en: "Cybersecurity", search: "cybersecurity"}
+];
+
+// CONTADOR DE VISITAS
+async function updateVisitorCount() {
+  const res = await fetch("https://api.countapi.xyz/hit/site-noticias/visitas");
+  const data = await res.json();
+  document.getElementById("visitorCount").innerText = data.value;
+}
+updateVisitorCount();
+
+// TRADUÇÃO
+let lang = "pt";
+
+function toggleLanguage() {
+  lang = lang === "pt" ? "en" : "pt";
+  loadAllNews();
+
+  if(lang === "en") {
+    document.getElementById("title").innerText = "🌐 Most Searched News in the World";
+    document.getElementById("visitorText").innerText = "Visitors:";
+  } else {
+    document.getElementById("title").innerText = "🌐 Notícias Mais Pesquisadas no Mundo";
+    document.getElementById("visitorText").innerText = "Visitantes:";
+  }
+}
+
+// MODO ESCURO
+function toggleTheme() {
+  document.body.classList.toggle("light");
+}
+
+// CARREGAR NOTÍCIAS
+async function loadAllNews() {
+  const container = document.getElementById("newsContainer");
+  container.innerHTML = "";
+
+  for (let topic of topics) {
+    const res = await fetch("https://api.spaceflightnewsapi.net/v4/articles/?search=" + topic.search);
+    const data = await res.json();
+
+    let title = lang === "pt" ? topic.pt : topic.en;
+
+    let section = `<h2>${title}</h2><div class="grid">`;
+
+    data.results.slice(0, 4).forEach(a => {
+      section += `
+        <div class="card">
+          <img src="${a.image_url}">
+          <h3>${a.title}</h3>
+          <p>${a.summary}</p>
+          <a href="${a.url}" target="_blank">Read more</a>
+        </div>
+      `;
+    });
+
+    section += "</div>";
+    container.innerHTML += section;
+  }
+
+  document.getElementById("updateDate").innerText =
+    (lang === "pt" ? "Atualizado: " : "Updated: ") +
+    new Date().toLocaleDateString();
+}
+
+// CARREGAR AO ABRIR
+loadAllNews();
+
+// ATUALIZA TODOS OS DIAS
+setInterval(loadAllNews, 86400000);
+</script>
+
+</body>
+</html>
 
 
  
