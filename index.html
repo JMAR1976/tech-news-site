@@ -51,10 +51,10 @@ img {
   width: 100%;
   border-radius: 10px;
 }
-#search {
+#searchGlobal {
   padding: 10px;
-  width: 80%;
-  margin: 15px;
+  width: 60%;
+  margin: 10px;
 }
 </style>
 </head>
@@ -65,7 +65,10 @@ img {
 <h1>🌐 Portal Ciência & Tecnologia</h1>
 <p id="updateDate"></p>
 
-<input type="text" id="search" placeholder="Pesquisar notícias..." onkeyup="filterNews()"><br>
+<input type="text" id="searchGlobal" placeholder="Pesquisar todas as notícias...">
+<button onclick="searchNews()">🔎 Pesquisar</button>
+
+<br>
 
 <button onclick="loadCategory('technology')">💻 Tecnologia</button>
 <button onclick="loadCategory('ai')">🤖 IA</button>
@@ -94,7 +97,7 @@ img {
 <script>
 let articles = [];
 
-// CARREGAR CATEGORIAS (FONTES FIDEDIGNAS)
+// CARREGAR CATEGORIAS
 async function loadCategory(category) {
 
   let url = "https://api.spaceflightnewsapi.net/v4/articles/";
@@ -123,10 +126,27 @@ async function loadCategory(category) {
   }));
 
   renderNews(articles);
+  updateDate();
+}
 
-  const today = new Date().toLocaleDateString();
-  document.getElementById("updateDate").innerText =
-    "Última atualização: " + today;
+// PESQUISA GLOBAL
+async function searchNews() {
+  const term = document.getElementById("searchGlobal").value;
+  if (!term) return;
+
+  const res = await fetch("https://api.spaceflightnewsapi.net/v4/articles/?search=" + term);
+  const data = await res.json();
+
+  articles = data.results.map(a => ({
+    title: a.title,
+    description: a.summary,
+    url: a.url,
+    image: a.image_url,
+    date: a.published_at
+  }));
+
+  renderNews(articles);
+  document.getElementById("updateDate").innerText = "Resultados para: " + term;
 }
 
 // MOSTRAR NOTÍCIAS
@@ -154,12 +174,19 @@ function renderNews(list) {
   });
 }
 
-// PESQUISA
-function filterNews() {
-  const term = document.getElementById("search").value.toLowerCase();
-  const filtered = articles.filter(a => a.title.toLowerCase().includes(term));
-  renderNews(filtered);
+// DATA
+function updateDate() {
+  const today = new Date().toLocaleDateString();
+  document.getElementById("updateDate").innerText =
+    "Última atualização: " + today;
 }
+
+// PESQUISA ENTER
+document.getElementById("searchGlobal").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    searchNews();
+  }
+});
 
 // VOZ
 function speak(text) {
@@ -201,15 +228,28 @@ function toggleTheme() {
   document.body.classList.toggle("light");
 }
 
-// ATUALIZA AUTOMATICAMENTE TODOS OS DIAS
+// ATUALIZA TODOS OS DIAS
 setInterval(() => loadCategory('technology'), 86400000);
 
-// CARREGAR TECNOLOGIA AO INICIAR
+// CARREGAR AO INICIAR
 loadCategory('technology');
 </script>
 
 </body>
 </html>
+
+
+
+
+
+ 
+ 
+
+
+
+
+ 
+  
 
 
 
