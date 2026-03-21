@@ -1,177 +1,18 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portal Ciência & Tecnologia</title>
 
-<style>
-:root {
-  --bg: #0f172a;
-  --card: #1e293b;
-  --text: white;
-}
-body.light {
-  --bg: #f1f5f9;
-  --card: #ffffff;
-  --text: #0f172a;
-}
-body {
-  margin: 0;
-  font-family: Arial;
-  background: var(--bg);
-  color: var(--text);
-}
-header {
-  padding: 20px;
-  text-align: center;
-  background: #020617;
-}
-nav a {
-  margin: 10px;
-  color: #38bdf8;
-  text-decoration: none;
-  font-weight: bold;
-}
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
-  gap: 20px;
-}
-.card {
-  background: var(--card);
-  padding: 15px;
-  border-radius: 10px;
-}
-img {
-  width: 100%;
-  border-radius: 10px;
-}
-button {
-  padding: 10px;
-  margin: 5px;
-  cursor: pointer;
-}
-</style>
-</head>
 
-<body>
 
-<header>
-<h1 id="site-title">Portal Ciência & Tecnologia</h1>
 
-<p><span id="visitor-text">Visitantes:</span> <span id="visitorCount">0</span></p>
 
-<nav>
-<a id="nav-home" href="#">Início</a>
-<a id="nav-technology" href="#">Tecnologia</a>
-<a id="nav-ai" href="#">IA</a>
-<a id="nav-science" href="#">Ciência</a>
-<a id="nav-space" href="#">Espaço</a>
-<a id="nav-medicine" href="#">Medicina</a>
-</nav>
 
-<button onclick="toggleLanguage()">🌍 PT / EN</button>
-<button onclick="toggleTheme()">🌙 Tema</button>
 
-</header>
 
-<div class="container">
-<h2 id="popular-title">Notícias Populares</h2>
-<div class="grid" id="news"></div>
-</div>
 
-<script>
-// TRADUÇÃO
-let currentLang = "pt";
+  
 
-const translations = {
-  pt: {
-    title: "Portal Ciência & Tecnologia",
-    home: "Início",
-    technology: "Tecnologia",
-    ai: "Inteligência Artificial",
-    science: "Ciência",
-    space: "Espaço",
-    medicine: "Medicina",
-    visitors: "Visitantes",
-    popular: "Notícias Populares"
-  },
-  en: {
-    title: "Science & Technology Portal",
-    home: "Home",
-    technology: "Technology",
-    ai: "Artificial Intelligence",
-    science: "Science",
-    space: "Space",
-    medicine: "Medicine",
-    visitors: "Visitors",
-    popular: "Popular News"
-  }
-};
 
-function toggleLanguage() {
-  currentLang = currentLang === "pt" ? "en" : "pt";
-  const t = translations[currentLang];
 
-  document.getElementById("site-title").innerText = t.title;
-  document.getElementById("nav-home").innerText = t.home;
-  document.getElementById("nav-technology").innerText = t.technology;
-  document.getElementById("nav-ai").innerText = t.ai;
-  document.getElementById("nav-science").innerText = t.science;
-  document.getElementById("nav-space").innerText = t.space;
-  document.getElementById("nav-medicine").innerText = t.medicine;
-  document.getElementById("visitor-text").innerText = t.visitors + ": ";
-  document.getElementById("popular-title").innerText = t.popular;
-}
 
-// TEMA
-function toggleTheme() {
-  document.body.classList.toggle("light");
-}
 
-// CONTADOR DE VISITANTES
-async function updateVisitorCount() {
-  const res = await fetch("https://api.countapi.xyz/hit/portal-ciencia-tecnologia/visitas");
-  const data = await res.json();
-  document.getElementById("visitorCount").innerText = data.value;
-}
-updateVisitorCount();
-
-// NOTÍCIAS AUTOMÁTICAS
-async function loadNews() {
-  const res = await fetch("https://api.spaceflightnewsapi.net/v4/articles/?search=technology");
-  const data = await res.json();
-  const articles = data.results;
-
-  const container = document.getElementById("news");
-  container.innerHTML = "";
-
-  articles.slice(0, 12).forEach(a => {
-    container.innerHTML += `
-      <div class="card">
-        <img src="${a.image_url}">
-        <h3>${a.title}</h3>
-        <p>${a.summary}</p>
-        <a href="${a.url}" target="_blank">Ler mais</a>
-      </div>
-    `;
-  });
-}
-
-loadNews();
-
-// Atualiza todos os dias
-setInterval(loadNews, 86400000);
-</script>
-
-</body>
-</html>
 
 
 
