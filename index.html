@@ -1,4 +1,4 @@
-```html
+```html id="8ct0dw"
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -83,7 +83,6 @@ h2 { margin-top: 40px; }
 </footer>
 
 <script>
-// TEMAS MAIS PESQUISADOS
 const topics = [
   {pt: "Inteligência Artificial", en: "Artificial Intelligence", search: "artificial intelligence"},
   {pt: "Tecnologia", en: "Technology", search: "technology"},
@@ -99,16 +98,17 @@ const topics = [
   {pt: "Cibersegurança", en: "Cybersecurity", search: "cybersecurity"}
 ];
 
-// CONTADOR DE VISITAS
+// CONTADOR DE VISITAS NOVO
 async function updateVisitorCount() {
   try {
-    const response = await fetch("https://api.countapi.xyz/hit/jmar-tech-news-site/visitas");
+    const response = await fetch(
+      "https://countapi.mileshilliard.com/api/v1/hit/jmar-tech-news-site"
+    );
 
-    if (!response.ok) {
-      throw new Error("Erro ao contactar API");
-    }
+    if (!response.ok) throw new Error("Erro API");
 
     const data = await response.json();
+
     document.getElementById("visitorCount").innerText = data.value;
 
   } catch (error) {
@@ -135,12 +135,12 @@ function toggleLanguage() {
   }
 }
 
-// MODO ESCURO
+// TEMA
 function toggleTheme() {
   document.body.classList.toggle("light");
 }
 
-// CARREGAR NOTÍCIAS
+// NOTÍCIAS
 async function loadAllNews() {
   const container = document.getElementById("newsContainer");
   container.innerHTML = "";
@@ -150,6 +150,7 @@ async function loadAllNews() {
       const res = await fetch(
         "https://api.spaceflightnewsapi.net/v4/articles/?search=" + topic.search
       );
+
       const data = await res.json();
 
       let title = lang === "pt" ? topic.pt : topic.en;
@@ -181,16 +182,24 @@ async function loadAllNews() {
     new Date().toLocaleDateString();
 }
 
-// CARREGAR AO ABRIR
 loadAllNews();
-
-// ATUALIZA TODOS OS DIAS
 setInterval(loadAllNews, 86400000);
 </script>
 
 </body>
 </html>
 ```
+
+ 
+
+
+
+
+
+   
+
+   
+
 
 
 
