@@ -1,131 +1,20 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Notícias do Mundo em Destaque</title>
 
-<meta name="description" content="Notícias do Mundo em Destaque: últimas notícias fidedignas em português sobre política, economia, tecnologia, saúde, desporto e mundo.">
-<meta name="keywords" content="notícias, notícias portugal, notícias mundo, atualidade, política, economia, tecnologia, desporto, saúde">
-<meta name="author" content="Notícias do Mundo em Destaque">
 
-<meta property="og:title" content="Notícias do Mundo em Destaque">
-<meta property="og:description" content="Portal de notícias em português com informação atualizada e credível.">
-<meta property="og:type" content="website">
 
-<style>
-:root{
-  --bg:#0f172a;
-  --card:#1e293b;
-  --accent:#38bdf8;
-  --text:#f8fafc;
-}
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-header{
-  background:#020617;
-  padding:24px;
-  text-align:center;
-}
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:24px;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:20px;
-}
-.card{
-  background:var(--card);
-  padding:18px;
-  border-radius:14px;
-}
-a{
-  color:#38bdf8;
-}
-</style>
-</head>
 
-<body>
 
-<header>
 
-<h1>📰 Notícias do Mundo em Destaque</h1>
 
-<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:10px;">
-  <div>👥 Total: <span id="visitorCount">0</span></div>
-  <div>📅 Hoje: <span id="todayCount">0</span></div>
-  <div>🟢 Online: <span id="onlineNow">1</span></div>
-</div>
 
-<div style="margin-top:15px;background:#dc2626;padding:10px;border-radius:8px;">
-🔴 ÚLTIMA HORA: Notícias sempre atualizadas
-</div>
 
-</header>
 
-<div class="container">
 
-<input id="search" placeholder="Pesquisar..." onkeyup="filterNews()">
 
-<div id="news"></div>
 
-</div>
 
-<script>
 
-const feeds = [
-"https://api.rss2json.com/v1/api.json?rss_url=https://www.rtp.pt/noticias/rss",
-"https://api.rss2json.com/v1/api.json?rss_url=https://eco.sapo.pt/feed/",
-"https://api.rss2json.com/v1/api.json?rss_url=https://pplware.sapo.pt/feed/"
-];
 
-async function loadNews(){
-  const container = document.getElementById("news");
-  container.innerHTML = "";
-
-  for (const url of feeds){
-    const res = await fetch(url);
-    const data = await res.json();
-
-    data.items.slice(0,10).forEach(n=>{
-      container.innerHTML += `
-      <div class="card">
-        <h3>${n.title}</h3>
-        <a href="${n.link}" target="_blank">Ler mais</a>
-      </div>`;
-    });
-  }
-}
-
-function filterNews(){
-  const val = document.getElementById("search").value.toLowerCase();
-  document.querySelectorAll(".card").forEach(c=>{
-    c.style.display = c.innerText.toLowerCase().includes(val) ? "" : "none";
-  });
-}
-
-async function visitors(){
-  const res = await fetch("https://api.countapi.xyz/hit/noticias-mundo/visits");
-  const data = await res.json();
-  document.getElementById("visitorCount").innerText = data.value;
-  document.getElementById("todayCount").innerText = Math.floor(data.value*0.1);
-}
-
-visitors();
-loadNews();
-
-</script>
-
-</body>
-</html>
 
 
 
