@@ -1,3 +1,5 @@
+
+```html
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -7,7 +9,6 @@
 <meta name="description" content="As notícias mais pesquisadas do mundo em tecnologia, ciência, medicina e inovação.">
 <title>Notícias Mais Pesquisadas no Mundo</title>
 
-<!-- Google AdSense Auto Ads -->
 <script async
 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5386266174463642"
 crossorigin="anonymous"></script>
@@ -16,11 +17,11 @@ crossorigin="anonymous"></script>
 :root{
   --bg:#0f172a;
   --card:#1e293b;
-  --text:#ffffff;
+  --text:#fff;
 }
 body.light{
   --bg:#f1f5f9;
-  --card:#ffffff;
+  --card:#fff;
   --text:#0f172a;
 }
 body{
@@ -48,20 +49,17 @@ header{
   background:var(--card);
   padding:15px;
   border-radius:10px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.2);
 }
 img{
   width:100%;
   border-radius:10px;
-  object-fit:cover;
   max-height:200px;
+  object-fit:cover;
 }
 button{
   padding:10px;
   margin:5px;
   cursor:pointer;
-  border:none;
-  border-radius:6px;
 }
 footer{
   text-align:center;
@@ -69,16 +67,7 @@ footer{
   background:#020617;
   margin-top:40px;
 }
-a{
-  color:#38bdf8;
-  text-decoration:none;
-}
-a:hover{
-  text-decoration:underline;
-}
-h2{
-  margin-top:40px;
-}
+a{color:#38bdf8;}
 </style>
 </head>
 
@@ -99,7 +88,6 @@ h2{
 
 <footer>
 <p>Este website funciona como agregador de notícias, mostrando apenas títulos, resumos e links para as fontes oficiais.</p>
-<p><a href="legal.html">Aviso Legal</a></p>
 </footer>
 
 <script>
@@ -112,31 +100,25 @@ const topics = [
   {pt:"Energia",en:"Energy",search:"energy"}
 ];
 
-// CONTADOR DE VISITAS
+let lang = "pt";
+
+// CONTADOR
 async function updateVisitorCount(){
-  const counter = document.getElementById("visitorCount");
-
   try{
-    await fetch(
-      "https://api.countapi.xyz/create?namespace=jmar-tech-news-site&key=visits&value=0"
-    );
-
     const response = await fetch(
       "https://api.countapi.xyz/hit/jmar-tech-news-site/visits"
     );
 
-    if(!response.ok) throw new Error();
-
     const data = await response.json();
-    counter.innerText = data.value;
+
+    document.getElementById("visitorCount").innerText =
+      data.value || 0;
 
   }catch(error){
-    console.error("Erro contador:", error);
-    counter.innerText = "0";
+    console.error(error);
+    document.getElementById("visitorCount").innerText = "0";
   }
 }
-
-let lang = "pt";
 
 function toggleLanguage(){
   lang = lang === "pt" ? "en" : "pt";
@@ -167,9 +149,9 @@ async function loadAllNews(){
         encodeURIComponent(topic.search)
       );
 
-      if(!res.ok) throw new Error();
-
       const data = await res.json();
+
+      if(!data.results || !data.results.length) continue;
 
       let section = `
         <h2>${lang === "pt" ? topic.pt : topic.en}</h2>
@@ -187,14 +169,10 @@ async function loadAllNews(){
                  alt="${article.title}"
                  loading="lazy"
                  onerror="this.style.display='none'">
-
             <h3>${article.title}</h3>
             <p>${resumo}</p>
-
-            <a href="${article.url}"
-               target="_blank"
-               rel="noopener noreferrer">
-               Read more
+            <a href="${article.url}" target="_blank" rel="noopener noreferrer">
+              Read more
             </a>
           </div>
         `;
@@ -204,7 +182,7 @@ async function loadAllNews(){
       container.innerHTML += section;
 
     }catch(error){
-      console.error("Erro ao carregar notícias:", error);
+      console.error(error);
     }
   }
 
@@ -222,6 +200,23 @@ setInterval(loadAllNews, 86400000);
 </body>
 </html>
 ```
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+   
+      
+         
+   
 
 
 
