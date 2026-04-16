@@ -1,4 +1,4 @@
-```html
+```html id="9g7h2m"
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -7,10 +7,9 @@
 <meta name="google-site-verification" content="VmGN_6lB30wphsQ4v-vTdsv3Wyax4XMeylYzYD5EHHQ" />
 <title>Notícias Mais Pesquisadas</title>
 
-<!-- Google AdSense -->
 <script async
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5386266174463642"
-  crossorigin="anonymous"></script>
+src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5386266174463642"
+crossorigin="anonymous"></script>
 
 <style>
 :root{
@@ -66,10 +65,6 @@ footer{
 }
 a{color:#38bdf8;}
 h2{margin-top:40px;}
-.ad-container{
-  text-align:center;
-  margin:20px auto;
-}
 </style>
 </head>
 
@@ -84,16 +79,6 @@ h2{margin-top:40px;}
 <button onclick="toggleTheme()">🌙 Tema</button>
 </header>
 
-<!-- Google AdSense -->
-<div class="ad-container">
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-5386266174463642"
-       data-ad-slot="SEU_SLOT_ID"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-</div>
-
 <div class="container" id="newsContainer"></div>
 
 <footer>
@@ -102,8 +87,6 @@ h2{margin-top:40px;}
 </footer>
 
 <script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-
 const topics = [
   {pt:"Inteligência Artificial",en:"Artificial Intelligence",search:"artificial intelligence"},
   {pt:"Tecnologia",en:"Technology",search:"technology"},
@@ -119,20 +102,12 @@ const topics = [
   {pt:"Cibersegurança",en:"Cybersecurity",search:"cybersecurity"}
 ];
 
-// CONTADOR DE VISITAS
 async function updateVisitorCount(){
   try{
-    const response = await fetch(
-      "https://api.countapi.xyz/hit/jmar-tech-news-site/visits"
-    );
-
-    if(!response.ok) throw new Error("Erro API");
-
+    const response = await fetch("https://api.countapi.xyz/hit/jmar-tech-news-site/visits");
     const data = await response.json();
     document.getElementById("visitorCount").innerText = data.value;
-
   }catch(error){
-    console.error("Erro no contador:", error);
     document.getElementById("visitorCount").innerText = "Indisponível";
   }
 }
@@ -145,13 +120,13 @@ function toggleLanguage(){
   lang = lang==="pt" ? "en" : "pt";
   loadAllNews();
 
-  if(lang==="en"){
-    document.getElementById("title").innerText="🌐 Most Searched News in the World";
-    document.getElementById("visitorText").innerText="Visitors:";
-  }else{
-    document.getElementById("title").innerText="🌐 Notícias Mais Pesquisadas no Mundo";
-    document.getElementById("visitorText").innerText="Visitantes:";
-  }
+  document.getElementById("title").innerText =
+    lang==="pt"
+      ? "🌐 Notícias Mais Pesquisadas no Mundo"
+      : "🌐 Most Searched News in the World";
+
+  document.getElementById("visitorText").innerText =
+    lang==="pt" ? "Visitantes:" : "Visitors:";
 }
 
 function toggleTheme(){
@@ -162,49 +137,54 @@ async function loadAllNews(){
   const container=document.getElementById("newsContainer");
   container.innerHTML="";
 
-  for(let topic of topics){
+  for(const topic of topics){
     try{
-      const res=await fetch(
-        "https://api.spaceflightnewsapi.net/v4/articles/?search="+topic.search
+      const res = await fetch(
+        "https://api.spaceflightnewsapi.net/v4/articles/?search="+encodeURIComponent(topic.search)
       );
 
-      const data=await res.json();
+      const data = await res.json();
 
-      let title=lang==="pt" ? topic.pt : topic.en;
-      let section=`<h2>${title}</h2><div class="grid">`;
+      let section=`<h2>${lang==="pt"?topic.pt:topic.en}</h2><div class="grid">`;
 
       data.results.slice(0,4).forEach(a=>{
-        section+=`
-          <div class="card">
-            <img src="${a.image_url}" alt="${a.title}" loading="lazy"
-                 onerror="this.style.display='none'">
-            <h3>${a.title}</h3>
-            <p>${a.summary}</p>
-            <a href="${a.url}" target="_blank" rel="noopener noreferrer">Read more</a>
-          </div>
-        `;
+        section += `
+        <div class="card">
+          <img src="${a.image_url}" alt="${a.title}" loading="lazy" onerror="this.style.display='none'">
+          <h3>${a.title}</h3>
+          <p>${a.summary}</p>
+          <a href="${a.url}" target="_blank" rel="noopener noreferrer">Read more</a>
+        </div>`;
       });
 
-      section+="</div>";
-      container.innerHTML+=section;
+      section += "</div>";
+      container.innerHTML += section;
 
     }catch(err){
-      console.error("Erro ao carregar notícias:", err);
+      console.error(err);
     }
   }
 
-  document.getElementById("updateDate").innerText=
-    (lang==="pt" ? "Atualizado: " : "Updated: ")+
-    new Date().toLocaleDateString();
+  document.getElementById("updateDate").innerText =
+    (lang==="pt"?"Atualizado: ":"Updated: ")+new Date().toLocaleDateString();
 }
 
 loadAllNews();
-setInterval(loadAllNews, 86400000);
+setInterval(loadAllNews,86400000);
 </script>
 
 </body>
 </html>
 ```
+
+
+
+
+
+
+ 
+
+
 
 
 
