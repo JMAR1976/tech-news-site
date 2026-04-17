@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>FlashNotícias | Últimas notícias virais</title>
+<title>FlashNotícias | Últimas notícias</title>
 
-<meta name="description" content="Últimas notícias de Portugal e do mundo com maior impacto e atualidade">
+<meta name="description" content="Notícias de Portugal e do mundo em tempo real">
 
 <style>
 body { margin:0; font-family: Arial; background:#eef1f5 }
@@ -24,17 +24,9 @@ header {
   padding:20px;
 }
 
-.stats {
-  background:#fff;
-  padding:10px;
-  margin-bottom:15px;
-  border-radius:8px;
-  text-align:center;
-}
-
 .destaque {
   background:#ffcc00;
-  padding:12px;
+  padding:10px;
   margin-bottom:15px;
   font-weight:bold;
 }
@@ -45,7 +37,6 @@ header {
   margin-bottom:15px;
   border-radius:8px;
   cursor:pointer;
-  box-shadow:0 2px 6px rgba(0,0,0,0.15);
 }
 
 .card img {
@@ -56,6 +47,15 @@ header {
   margin-bottom:10px;
 }
 
+.card h2 {
+  font-size:18px;
+  line-height:1.3;
+}
+
+.erro {
+  color:red;
+  text-align:center;
+}
 </style>
 </head>
 
@@ -63,11 +63,10 @@ header {
 
 <header>
 <h1>⚡ FlashNotícias</h1>
-<p>Notícias mais relevantes e virais</p>
+<p>Notícias em tempo real</p>
 </header>
 
 <div class="container">
-<div class="stats" id="stats"></div>
 <div id="app">🔄 A carregar notícias...</div>
 </div>
 
@@ -75,44 +74,10 @@ header {
 
 const API_URL = "https://newsapi.org/v2/top-headlines?country=pt&apiKey=2d89f5a76883471f94d8f753c5794413";
 
-// visitas
-let visitas = Number(localStorage.getItem("visitas") || 0);
-visitas++;
-localStorage.setItem("visitas", visitas);
-
-// ganhos
-let ganhoTotal = Number(localStorage.getItem("ganhoTotal") || 0);
-
-// stats
-function atualizarStats(){
-  document.getElementById("stats").textContent =
-    `👁️ ${visitas} visitas | 💰 ${ganhoTotal.toFixed(2)}€`;
-}
-
-// slug seguro
-function slug(t){
-  return (t || "id").toLowerCase().replace(/[^a-z0-9]+/g,'-');
-}
-
-// clique
-function registarClique(n){
-  const id = slug(n.title);
-
-  let clicks = Number(localStorage.getItem("click_"+id) || 0);
-  clicks++;
-  localStorage.setItem("click_"+id, clicks);
-
-  ganhoTotal += 0.03;
-  localStorage.setItem("ganhoTotal", ganhoTotal);
-
-  atualizarStats();
-}
-
 // abrir notícia
-function abrir(n){
-  if(n && n.url){
-    registarClique(n);
-    window.open(n.url, "_blank", "noopener,noreferrer");
+function abrir(url){
+  if(typeof url === "string" && url.startsWith("http")){
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 }
 
@@ -123,44 +88,50 @@ function tituloViral(t){
   return "🔴 ÚLTIMA HORA: " + t;
 }
 
-// score
-function score(n){
-  let s = 0;
-  const t = (n.title || "").toLowerCase();
-
-  ["morte","crise","guerra","acidente","urgente"].forEach(p=>{
-    if(t.includes(p)) s+=3;
-  });
-
-  if(n.urlToImage) s+=2;
-
-  return s;
-}
-
 // criar card
 function criarCard(n){
 
   const card = document.createElement("div");
   card.className = "card";
-  card.onclick = () => abrir(n);
 
-  if(n.urlToImage){
-    const img = document.createElement("img");
-    img.src = n.urlToImage;
-    img.onerror = () => img.remove();
-    card.appendChild(img);
+  if(n.url){
+    card.onclick = () => abrir(n.url);
   }
 
+  const img = document.createElement("img");
+
+  if(n.urlToImage && n.urlToImage.startsWith("http")){
+    img.src = n.urlToImage;
+  } else {
+    img.src = "https://via.placeholder.com/800x400?text=Sem+Imagem";
+  }
+
+  img.onerror = () => {
+    img.onerror = null;
+    img.src = "https://via.placeholder.com/800x400?text=Imagem+Indisponível";
+  };
+
   const h2 = document.createElement("h2");
-  h2.textContent = tituloViral(n.title);
+  h2.textContent = tituloViral(n.title).slice(0,120);
 
   const p = document.createElement("p");
   p.textContent = n.description || "Sem descrição disponível";
 
+  card.appendChild(img);
   card.appendChild(h2);
   card.appendChild(p);
 
   return card;
+}
+
+// fetch com timeout
+function fetchComTimeout(url, timeout = 8000){
+  return Promise.race([
+    fetch(url),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Timeout")), timeout)
+    )
+  ]);
 }
 
 // carregar notícias
@@ -170,7 +141,7 @@ async function loadNews(){
 
   try {
 
-    const res = await fetch(API_URL);
+    const res = await fetchComTimeout(API_URL);
 
     if(!res.ok){
       throw new Error("Erro HTTP");
@@ -185,38 +156,63 @@ async function loadNews(){
     let artigos = data.articles.filter(n => n && n.title);
 
     if(artigos.length === 0){
-      throw new Error("Sem notícias");
+      throw new Error("Sem notícias disponíveis");
     }
-
-    artigos.sort((a,b)=>score(b)-score(a));
 
     container.innerHTML = "";
 
+    // destaque
     const destaque = document.createElement("div");
     destaque.className = "destaque";
-    destaque.textContent = tituloViral(artigos[0].title || "Sem destaque");
+    destaque.textContent = tituloViral(artigos[0].title);
     container.appendChild(destaque);
 
+    // lista
     artigos.slice(0,10).forEach(n=>{
       container.appendChild(criarCard(n));
     });
 
   } catch(e){
-    container.textContent = "⚠️ Erro ao carregar notícias";
+
     console.error(e);
+
+    container.innerHTML = `
+      <div class="erro">
+        ⚠️ Não foi possível carregar notícias.<br>
+        Tenta novamente mais tarde.
+      </div>
+    `;
   }
 }
 
 // iniciar
-document.addEventListener("DOMContentLoaded", ()=>{
-  atualizarStats();
-  loadNews();
-});
+document.addEventListener("DOMContentLoaded", loadNews);
 
 </script>
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+    
+
+ 
+
+
 
 
 
