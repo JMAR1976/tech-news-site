@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notícias Portugal Hoje</title>
+<meta name="description" content="Últimas notícias de Portugal e do mundo atualizadas em tempo real">
+<link rel="icon" href="favicon.ico">
+<link rel="canonical" href="https://jmar1976.github.io/">
+
+<style>
+body{margin:0;font-family:Arial;}
+header{text-align:center;padding:20px;}
+nav{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;background:#eee;padding:10px;}
+nav a{text-decoration:none;color:#0077cc;font-weight:bold;}
+.container{max-width:1000px;margin:auto;padding:20px;}
+.card{border-bottom:1px solid #ccc;margin-bottom:20px;}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>📰 Notícias Portugal Hoje</h1>
+</header>
+
+<nav>
+<a href="index.html">Início</a>
+<a href="tecnologia.html">Tecnologia</a>
+<a href="economia.html">Economia</a>
+<a href="desporto.html">Desporto</a>
+<a href="mundo.html">Mundo</a>
+<a href="portugal.html">Portugal</a>
+<a href="saude.html">Saúde</a>
+<a href="lifestyle.html">Lifestyle</a>
+<a href="sobre.html">Sobre</a>
+<a href="contacto.html">Contacto</a>
+</nav>
+
+<div class="container" id="news"></div>
+
+<script>
+const feeds=[
+"https://api.rss2json.com/v1/api.json?rss_url=https://www.rtp.pt/noticias/rss",
+"https://api.rss2json.com/v1/api.json?rss_url=https://eco.sapo.pt/feed/"
+];
+
+async function load(){
+let all=[];
+for(const f of feeds){
+try{
+const r=await fetch(f);
+const d=await r.json();
+if(d.items) all.push(...d.items);
+}catch(e){}
+}
+
+all.sort((a,b)=>new Date(b.pubDate)-new Date(a.pubDate));
+
+let html="";
+all.slice(0,20).forEach(n=>{
+html+=`
+<div class="card">
+<h2><a href="artigo.html?title=${encodeURIComponent(n.title)}&link=${encodeURIComponent(n.link)}">${n.title}</a></h2>
+<p>${(n.description||"").substring(0,150)}</p>
+</div>`;
+});
+
+document.getElementById("news").innerHTML=html;
+}
+load();
+</script>
+
+</body>
+</html>
