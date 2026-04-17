@@ -49,7 +49,6 @@ header {
 
 .card h2 {
   font-size:18px;
-  line-height:1.3;
 }
 
 .erro {
@@ -72,7 +71,7 @@ header {
 
 <script>
 
-const API_URL = "https://newsapi.org/v2/top-headlines?country=pt&apiKey=2d89f5a76883471f94d8f753c5794413";
+const API_URL = "https://gnews.io/api/v4/top-headlines?lang=pt&max=10&token=demo";
 
 // abrir notícia
 function abrir(url){
@@ -100,8 +99,8 @@ function criarCard(n){
 
   const img = document.createElement("img");
 
-  if(n.urlToImage && n.urlToImage.startsWith("http")){
-    img.src = n.urlToImage;
+  if(n.image && typeof n.image === "string" && n.image.startsWith("http")){
+    img.src = n.image;
   } else {
     img.src = "https://via.placeholder.com/800x400?text=Sem+Imagem";
   }
@@ -124,16 +123,6 @@ function criarCard(n){
   return card;
 }
 
-// fetch com timeout
-function fetchComTimeout(url, timeout = 8000){
-  return Promise.race([
-    fetch(url),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Timeout")), timeout)
-    )
-  ]);
-}
-
 // carregar notícias
 async function loadNews(){
 
@@ -141,7 +130,7 @@ async function loadNews(){
 
   try {
 
-    const res = await fetchComTimeout(API_URL);
+    const res = await fetch(API_URL);
 
     if(!res.ok){
       throw new Error("Erro HTTP");
@@ -149,14 +138,12 @@ async function loadNews(){
 
     const data = await res.json();
 
-    if(!data || !Array.isArray(data.articles)){
-      throw new Error("Dados inválidos");
-    }
-
-    let artigos = data.articles.filter(n => n && n.title);
+    const artigos = Array.isArray(data.articles)
+      ? data.articles.filter(n => n && n.title)
+      : [];
 
     if(artigos.length === 0){
-      throw new Error("Sem notícias disponíveis");
+      throw new Error("Sem notícias");
     }
 
     container.innerHTML = "";
@@ -168,7 +155,7 @@ async function loadNews(){
     container.appendChild(destaque);
 
     // lista
-    artigos.slice(0,10).forEach(n=>{
+    artigos.forEach(n=>{
       container.appendChild(criarCard(n));
     });
 
@@ -192,6 +179,18 @@ document.addEventListener("DOMContentLoaded", loadNews);
 
 </body>
 </html>
+
+
+
+
+
+ 
+
+ 
+   
+  
+   
+
 
 
 
