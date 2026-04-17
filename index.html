@@ -4,18 +4,56 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>FlashNotícias</title>
+<title>FlashNotícias | Jornal Online</title>
 
 <style>
-body { margin:0; font-family: Arial; background:#eef1f5 }
-header { background:#c40000; color:#fff; padding:20px; text-align:center }
-.container { max-width:1000px; margin:auto; padding:20px }
+body { margin:0; font-family: Arial; background:#f4f4f4 }
+
+header {
+  background:#c40000;
+  color:#fff;
+  padding:20px;
+  text-align:center;
+}
+
+.container {
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:20px;
+}
+
+.hero, .sidebar, .card {
+  background:#fff;
+  border-radius:8px;
+  overflow:hidden;
+}
+
+.hero img {
+  width:100%;
+  height:300px;
+  object-fit:cover;
+}
+
+.hero h2 { padding:15px }
+
+.sidebar { padding:15px }
+
+.side-item {
+  margin-bottom:10px;
+  border-bottom:1px solid #ddd;
+  padding-bottom:10px;
+  cursor:pointer;
+}
 
 .card {
-  background:#fff;
   padding:15px;
   margin-bottom:15px;
-  border-radius:8px;
   cursor:pointer;
 }
 
@@ -24,13 +62,11 @@ header { background:#c40000; color:#fff; padding:20px; text-align:center }
   height:200px;
   object-fit:cover;
   border-radius:6px;
+  margin-bottom:10px;
 }
 
-.destaque {
-  background:#ffcc00;
-  padding:10px;
-  margin-bottom:15px;
-  font-weight:bold;
+@media(max-width:768px){
+  .grid { grid-template-columns:1fr }
 }
 </style>
 </head>
@@ -39,106 +75,137 @@ header { background:#c40000; color:#fff; padding:20px; text-align:center }
 
 <header>
 <h1>⚡ FlashNotícias</h1>
+<p>Últimas notícias de Portugal e do mundo</p>
 </header>
 
-<div class="container" id="app">
-🔄 A carregar notícias...
+<div class="container">
+
+<div class="grid">
+<div id="hero"></div>
+<div class="sidebar">
+<h3>📰 Últimas</h3>
+<div id="sidebar"></div>
+</div>
+</div>
+
+<div id="news"></div>
+
 </div>
 
 <script>
 
-// 🔥 API PRINCIPAL
-const API1 = "https://gnews.io/api/v4/top-headlines?lang=pt&max=10&token=demo";
+const RSS_URL = "https://api.allorigins.win/get?url=" +
+encodeURIComponent("https://feeds.bbci.co.uk/news/rss.xml");
 
-// 🔥 API BACKUP (SEM KEY)
-const API2 = "https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/rss.xml";
-
-// abrir
 function abrir(url){
-  if(url) window.open(url, "_blank");
+  if(url) window.open(url, "_blank", "noopener,noreferrer");
 }
 
-// criar card
-function criarCard(n){
-
-  const card = document.createElement("div");
-  card.className = "card";
-  card.onclick = () => abrir(n.url);
-
-  const img = document.createElement("img");
-  img.src = n.image || n.thumbnail || "https://via.placeholder.com/800x400?text=Noticia";
-  img.onerror = () => img.remove();
-
-  const h2 = document.createElement("h2");
-  h2.textContent = n.title;
-
-  card.appendChild(img);
-  card.appendChild(h2);
-
-  return card;
+function extrairImagem(desc){
+  if(!desc) return "https://via.placeholder.com/800x400";
+  const match = desc.match(/<img.*?src="(.*?)"/);
+  return match ? match[1] : "https://via.placeholder.com/800x400";
 }
 
-// carregar GNews
-async function carregarGNews(){
-  const res = await fetch(API1);
-  const data = await res.json();
-  return data.articles;
-}
-
-// carregar RSS
-async function carregarRSS(){
-  const res = await fetch(API2);
-  const data = await res.json();
-
-  return data.items.map(i => ({
-    title: i.title,
-    url: i.link,
-    image: i.thumbnail
-  }));
-}
-
-// principal
 async function loadNews(){
 
-  const container = document.getElementById("app");
+  const hero = document.getElementById("hero");
+  const sidebar = document.getElementById("sidebar");
+  const news = document.getElementById("news");
 
   try {
 
-    let artigos = [];
+    const res = await fetch(RSS_URL);
 
-    try {
-      artigos = await carregarGNews();
-    } catch {
-      artigos = [];
+    if(!res.ok){
+      throw new Error("Erro HTTP");
     }
 
-    if(!artigos || artigos.length === 0){
-      artigos = await carregarRSS();
+    const data = await res.json();
+
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(data.contents, "text/xml");
+
+    const items = xml.querySelectorAll("item");
+
+    if(items.length === 0){
+      throw new Error("Sem dados");
     }
 
-    container.innerHTML = "";
+    // limpar
+    hero.innerHTML = "";
+    sidebar.innerHTML = "";
+    news.innerHTML = "";
 
-    // destaque
-    const destaque = document.createElement("div");
-    destaque.className = "destaque";
-    destaque.textContent = artigos[0]?.title || "Notícia";
-    container.appendChild(destaque);
+    const artigos = [];
 
-    artigos.slice(0,10).forEach(n=>{
-      container.appendChild(criarCard(n));
+    items.forEach(item=>{
+      artigos.push({
+        title: item.querySelector("title")?.textContent || "",
+        link: item.querySelector("link")?.textContent || "",
+        desc: item.querySelector("description")?.textContent || ""
+      });
+    });
+
+    // HERO
+    const first = artigos[0];
+
+    const heroDiv = document.createElement("div");
+    heroDiv.className = "hero";
+    heroDiv.onclick = () => abrir(first.link);
+
+    heroDiv.innerHTML = `
+      <img src="${extrairImagem(first.desc)}" onerror="this.remove()">
+      <h2>🔴 ${first.title}</h2>
+    `;
+
+    hero.appendChild(heroDiv);
+
+    // SIDEBAR
+    artigos.slice(1,6).forEach(n=>{
+      const div = document.createElement("div");
+      div.className = "side-item";
+      div.textContent = n.title;
+      div.onclick = () => abrir(n.link);
+      sidebar.appendChild(div);
+    });
+
+    // RESTO
+    artigos.slice(6,15).forEach(n=>{
+      const card = document.createElement("div");
+      card.className = "card";
+      card.onclick = () => abrir(n.link);
+
+      card.innerHTML = `
+        <img src="${extrairImagem(n.desc)}" onerror="this.remove()">
+        <h2>${n.title}</h2>
+      `;
+
+      news.appendChild(card);
     });
 
   } catch(e){
-    container.innerHTML = "Erro ao carregar notícias";
+    console.error(e);
+    document.getElementById("news").innerHTML = "⚠️ Erro ao carregar notícias";
   }
 }
 
-loadNews();
+document.addEventListener("DOMContentLoaded", loadNews);
 
 </script>
 
 </body>
 </html>
+
+
+
+
+
+
+
+ 
+  
+
  
 
 
